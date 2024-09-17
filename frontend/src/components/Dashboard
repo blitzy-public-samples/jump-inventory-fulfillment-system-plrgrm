@@ -1,0 +1,33 @@
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { selectOrderSummary } from 'frontend/src/store/orderSlice';
+
+const OrderSummary: React.FC = () => {
+  const orderSummary = useSelector(selectOrderSummary);
+
+  return (
+    <div className="order-summary">
+      <h2>Order Summary</h2>
+      <div className="summary-stats">
+        <div className="stat-item">
+          <span className="stat-label">Total Orders:</span>
+          <span className="stat-value">{orderSummary.totalOrders}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Unfulfilled Orders:</span>
+          <span className="stat-value">{orderSummary.unfulfilledOrders}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Completed Orders:</span>
+          <span className="stat-value">{orderSummary.completedOrders}</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-label">Total Revenue:</span>
+          <span className="stat-value">${orderSummary.totalRevenue.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default OrderSummary;
