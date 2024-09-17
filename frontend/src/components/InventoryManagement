@@ -1,0 +1,62 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchInventoryThunk, selectInventory } from 'frontend/src/store/inventorySlice';
+
+const InventoryList: React.FC = () => {
+  const dispatch = useDispatch();
+  const inventory = useSelector(selectInventory);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  useEffect(() => {
+    dispatch(fetchInventoryThunk());
+  }, [dispatch]);
+
+  const filteredInventory = inventory.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredInventory.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  return (
+    <div>
+      <input
+        type="text"
+        placeholder="Search inventory..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <ul>
+        {currentItems.map((item) => (
+          <li key={item.id}>
+            {item.name} - SKU: {item.sku} - Quantity: {item.quantity}
+          </li>
+        ))}
+      </ul>
+      <div>
+        {Array.from({ length: Math.ceil(filteredInventory.length / itemsPerPage) }, (_, i) => (
+          <button key={i} onClick={() => paginate(i + 1)}>
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default InventoryList;
+
+// HUMAN ASSISTANCE NEEDED
+// The following improvements are recommended:
+// 1. Implement error handling for the API call
+// 2. Add loading state while fetching data
+// 3. Implement more advanced filtering options
+// 4. Consider using a table component for better data presentation
+// 5. Implement sorting functionality
+// 6. Add accessibility features
