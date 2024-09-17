@@ -1,0 +1,75 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUnfulfilledOrdersThunk, selectUnfulfilledOrders } from 'frontend/src/store/orderSlice';
+
+const OrderList: React.FC = () => {
+  const dispatch = useDispatch();
+  const unfulfilledOrders = useSelector(selectUnfulfilledOrders);
+  const [page, setPage] = useState(1);
+  const [sortBy, setSortBy] = useState('date');
+  const [filterBy, setFilterBy] = useState('');
+
+  useEffect(() => {
+    dispatch(fetchUnfulfilledOrdersThunk());
+  }, [dispatch]);
+
+  // HUMAN ASSISTANCE NEEDED
+  // Implement pagination or infinite scrolling
+  // This is a basic implementation and might need adjustments based on the API and requirements
+  const loadMoreOrders = () => {
+    setPage(prevPage => prevPage + 1);
+    dispatch(fetchUnfulfilledOrdersThunk({ page: page + 1 }));
+  };
+
+  // HUMAN ASSISTANCE NEEDED
+  // Implement sorting and filtering logic
+  // This is a basic implementation and might need adjustments based on the requirements
+  const handleSort = (criteria: string) => {
+    setSortBy(criteria);
+    // Dispatch action to sort orders
+  };
+
+  const handleFilter = (filter: string) => {
+    setFilterBy(filter);
+    // Dispatch action to filter orders
+  };
+
+  return (
+    <div className="order-list">
+      <h2>Unfulfilled Orders</h2>
+      
+      {/* Sorting and filtering controls */}
+      <div className="controls">
+        <select onChange={(e) => handleSort(e.target.value)} value={sortBy}>
+          <option value="date">Sort by Date</option>
+          <option value="status">Sort by Status</option>
+          {/* Add more sorting options as needed */}
+        </select>
+        <input 
+          type="text" 
+          placeholder="Filter orders" 
+          value={filterBy} 
+          onChange={(e) => handleFilter(e.target.value)}
+        />
+      </div>
+
+      {/* Order list */}
+      <ul>
+        {unfulfilledOrders.map(order => (
+          <li key={order.id}>
+            <span>Order #{order.id}</span>
+            <span>Date: {new Date(order.date).toLocaleDateString()}</span>
+            <span>Status: {order.status}</span>
+            <span>Customer: {order.customerName}</span>
+            {/* Add more order details as needed */}
+          </li>
+        ))}
+      </ul>
+
+      {/* Load more button for pagination */}
+      <button onClick={loadMoreOrders}>Load More</button>
+    </div>
+  );
+};
+
+export default OrderList;
