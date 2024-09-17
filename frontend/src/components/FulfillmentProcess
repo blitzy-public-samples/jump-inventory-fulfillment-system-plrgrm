@@ -1,0 +1,50 @@
+import React, { useState, useEffect } from 'react';
+import { BrowserMultiFormatReader } from '@zxing/library';
+
+// HUMAN ASSISTANCE NEEDED
+// This component requires additional work to be production-ready.
+// The confidence level is below 0.8, and there might be edge cases or error handling that need to be addressed.
+const BarcodeScanner: React.FC<{ onScan: (data: string) => void }> = ({ onScan }) => {
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const codeReader = new BrowserMultiFormatReader();
+
+    const initializeScanner = async () => {
+      try {
+        const videoInputDevices = await codeReader.listVideoInputDevices();
+        if (videoInputDevices.length === 0) {
+          throw new Error('No camera found');
+        }
+
+        const selectedDeviceId = videoInputDevices[0].deviceId;
+
+        await codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+          if (result) {
+            onScan(result.getText());
+          }
+          if (err && !(err instanceof ZXing.NotFoundException)) {
+            setError('Error scanning barcode');
+          }
+        });
+      } catch (err) {
+        setError('Failed to initialize barcode scanner');
+      }
+    };
+
+    initializeScanner();
+
+    return () => {
+      codeReader.reset();
+    };
+  }, [onScan]);
+
+  return (
+    <div>
+      <video id="video" width="300" height="200"></video>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+    </div>
+  );
+};
+
+export default BarcodeScanner;
