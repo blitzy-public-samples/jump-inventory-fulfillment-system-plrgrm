@@ -1,0 +1,61 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { selectInventoryReport } from 'frontend/src/store/reportingSlice';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+
+// HUMAN ASSISTANCE NEEDED
+// This component may need additional refinement for production readiness.
+// Consider adding error handling, loading states, and improving the UI/UX.
+
+const InventoryReport: React.FC = () => {
+  const [reportData, setReportData] = useState<any[]>([]);
+  const [timeRange, setTimeRange] = useState<string>('week');
+
+  const inventoryReport = useSelector(selectInventoryReport);
+
+  useEffect(() => {
+    // Fetch inventory report data
+    // This is a placeholder and should be replaced with actual data fetching logic
+    const fetchData = async () => {
+      try {
+        // Simulating API call
+        const data = await inventoryReport(timeRange);
+        setReportData(data);
+      } catch (error) {
+        console.error('Error fetching inventory report:', error);
+      }
+    };
+
+    fetchData();
+  }, [timeRange, inventoryReport]);
+
+  const handleTimeRangeChange = (range: string) => {
+    setTimeRange(range);
+  };
+
+  const exportData = () => {
+    // Implement export functionality
+    console.log('Exporting data...');
+  };
+
+  return (
+    <div className="inventory-report">
+      <h2>Inventory Report</h2>
+      <div className="time-range-selector">
+        <button onClick={() => handleTimeRangeChange('week')}>Week</button>
+        <button onClick={() => handleTimeRangeChange('month')}>Month</button>
+        <button onClick={() => handleTimeRangeChange('year')}>Year</button>
+      </div>
+      <BarChart width={600} height={300} data={reportData}>
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar dataKey="quantity" fill="#8884d8" />
+      </BarChart>
+      <button onClick={exportData}>Export Report</button>
+    </div>
+  );
+};
+
+export default InventoryReport;
